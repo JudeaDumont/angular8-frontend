@@ -9,7 +9,7 @@ export interface CustomResponse {
     developerMessage: string;
     data: {
         servers?: Server[],
-        server: Server,
+        server?: Server,
         
     }
 }

@@ -9,12 +9,12 @@ import { Status } from '../enum/status.enum';
   providedIn: 'root'
 })
 export class ServerService {
-  private readonly apiUrl = 'any';
+  private readonly apiUrl = 'http://localhost:7777';
   constructor(private http: HttpClient) { }
 
   server$ =
     <Observable<CustomResponse>>this.http.get<CustomResponse>
-      (`${this.apiUrl}`).pipe(
+      (`${this.apiUrl}/api/v1/candidate`).pipe(
         tap(console.log),
         catchError(this.handleError)
       );

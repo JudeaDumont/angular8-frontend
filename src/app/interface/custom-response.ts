@@ -10,6 +10,5 @@ export interface CustomResponse {
     data: {
         servers?: Server[],
         server?: Server,
-        
     }
 }

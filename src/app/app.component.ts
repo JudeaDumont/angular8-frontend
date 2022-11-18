@@ -1,4 +1,9 @@
 import { Component } from '@angular/core';
+import { Observable, startWith, map, catchError, of } from 'rxjs';
+import { DataState } from './enum/data-state.enum';
+import { AppState } from './interface/app-state';
+import { CustomResponse } from './interface/custom-response';
+import { ServerService } from './service/server.service';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +11,24 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+  appState$: Observable<AppState<CustomResponse>>;
+  constructor(private serviceService: ServerService){
+  }
+  
+  ngOnInit(): void {
+    this.appState$ = this.serviceService.server$
+    .pipe(
+      map(response => {
+        return { dataState: DataState.LOADED, 
+          appData: response}
+      }),
+      startWith({ dataState: DataState.LOADING}),
+      catchError((error:string)=>{
+        console.log(error);
+        return of({dataState: DataState.ERROR, error: error})
+      })
+    );
+  }
   title = 'sample-project';
 }
+

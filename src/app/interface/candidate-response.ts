@@ -1,6 +1,6 @@
-import { Server } from "./server";
+import { Candidate } from "./candidate";
 
-export interface CustomResponse {
+export interface CandidateResponse {
     timeStamp: Date;
     statusCode: number;
     status: string;
@@ -8,7 +8,7 @@ export interface CustomResponse {
     message: string;
     developerMessage: string;
     data: {
-        servers?: Server[],
-        server?: Server,
+        candidates?: Candidate[],
+        candidate?: Candidate,
     }
 }

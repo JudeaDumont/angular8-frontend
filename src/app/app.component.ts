@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Observable, startWith, map, catchError, of } from 'rxjs';
 import { DataState } from './enum/data-state.enum';
 import { AppState } from './interface/app-state';
-import { CustomResponse } from './interface/custom-response';
+import { CandidateResponse } from './interface/candidate-response';
 import { ServerService } from './service/server.service';
 
 @Component({
@@ -11,7 +11,7 @@ import { ServerService } from './service/server.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  appState$: Observable<AppState<CustomResponse>>;
+  appState$: Observable<AppState<CandidateResponse>>;
   constructor(private serviceService: ServerService){
   }
   

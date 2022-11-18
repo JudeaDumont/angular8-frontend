@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, Observable, tap, throwError } from 'rxjs';
-import { CustomResponse } from '../interface/custom-response';
-import { Server } from '../interface/server';
-import { Status } from '../enum/status.enum';
+import { CandidateResponse } from '../interface/candidate-response';
+import { Candidate } from '../interface/candidate';
 
 @Injectable({
   providedIn: 'root'
@@ -13,50 +12,49 @@ export class ServerService {
   constructor(private http: HttpClient) { }
 
   server$ =
-    <Observable<CustomResponse>>this.http.get<CustomResponse>
+    <Observable<CandidateResponse>>this.http.get<CandidateResponse>
       (`${this.apiUrl}/api/v1/candidate`).pipe(
         tap(console.log),
         catchError(this.handleError)
       );
 
-  save$ = (server: Server) =>
-    <Observable<CustomResponse>>this.http.post<CustomResponse>
+  save$ = (server: Candidate) =>
+    <Observable<CandidateResponse>>this.http.post<CandidateResponse>
       (`${this.apiUrl}/server/save`, server).pipe(
         tap(console.log),
         catchError(this.handleError)
       );
 
   ping$ = (ipAddress: string) =>
-    <Observable<CustomResponse>>this.http.get<CustomResponse>
+    <Observable<CandidateResponse>>this.http.get<CandidateResponse>
       (`${this.apiUrl}/server/ping/${ipAddress}`).pipe(
         tap(console.log),
         catchError(this.handleError)
       );
 
-      filter$ = (status: Status, response: CustomResponse) =>
-        <Observable<CustomResponse>> new Observable<CustomResponse>(
+      filter$ = (name: string, response: CandidateResponse) =>
+        <Observable<CandidateResponse>> new Observable<CandidateResponse>(
           subscriber => {
             console.log(response);
             subscriber.next(
-              status === Status.ALL ? 
-              {...response, 
-                message: `Servers filtered by ${status} status`}
-              : {
-                ...response,
-                message: response.data.servers
-                .filter(server => server.status === status)
-                .length > 0 ?
-                `Servers filtered by 
-                ${status === Status.SERVER_UP ?
-                  'SERVER UP' : 'SERVER DOWN'} 
-                  status` :
-                `No servers of ${status} found`,
-                data: {
-                  servers: response.data.servers.filter
-                  (server => server.status === status)
-                }
-              }
-
+              // name === '' ? 
+              // {...response, 
+              //   message: `Candidates filtered by name: ${name}`}
+              // : {
+              //   ...response,
+              //   message: response.data.candidates
+              //   .filter(candidate => candidate.name === name)
+              //   .length > 0 
+              //   ?
+              //   `Candidates filtered by 
+              //   ${name.includes("chef") ? 'chef' : 'not chef'}:` 
+              //   :
+              //   `No candidates named ${name} found`,
+              //   data: {
+              //     candidates: response.data.candidates.filter
+              //     (candidate => candidate.name === name)
+              //   }
+              // }
             );
             subscriber.complete();
           }
@@ -65,17 +63,17 @@ export class ServerService {
             catchError(this.handleError)
           );
 
-  delete$ = (server: Server) =>
-    <Observable<CustomResponse>>this.http.delete<CustomResponse>
-      (`${this.apiUrl}/server/ping/delete/${server.id}`).pipe(
+  delete$ = (candidate: Candidate) =>
+    <Observable<CandidateResponse>>this.http.delete<CandidateResponse>
+      (`${this.apiUrl}/candidate/ping/delete/${candidate.id}`).pipe(
         tap(console.log),
         catchError(this.handleError)
       );
 
 
   deleteById$ = (id: string) =>
-    <Observable<CustomResponse>>this.http.delete<CustomResponse>
-      (`${this.apiUrl}/server/ping/delete/${id}`).pipe(
+    <Observable<CandidateResponse>>this.http.delete<CandidateResponse>
+      (`${this.apiUrl}/candidate/ping/delete/${id}`).pipe(
         tap(console.log),
         catchError(this.handleError)
       );

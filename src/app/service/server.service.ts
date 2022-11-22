@@ -11,24 +11,24 @@ export class ServerService {
   private readonly apiUrl = 'http://localhost:7777';
   constructor(private http: HttpClient) { }
 
-  server$ =
-    <Observable<CandidateResponse>>this.http.get<CandidateResponse>
+  candidates$ =
+    <Observable<Candidate[]>>this.http.get<Candidate[]>
       (`${this.apiUrl}/api/v1/candidate`).pipe(
-        tap(console.log),
+        //tap(console.log),
         catchError(this.handleError)
       );
 
   save$ = (server: Candidate) =>
     <Observable<CandidateResponse>>this.http.post<CandidateResponse>
       (`${this.apiUrl}/server/save`, server).pipe(
-        tap(console.log),
+        //tap(console.log),
         catchError(this.handleError)
       );
 
   ping$ = (ipAddress: string) =>
     <Observable<CandidateResponse>>this.http.get<CandidateResponse>
       (`${this.apiUrl}/server/ping/${ipAddress}`).pipe(
-        tap(console.log),
+        //tap(console.log),
         catchError(this.handleError)
       );
 
@@ -59,14 +59,14 @@ export class ServerService {
             subscriber.complete();
           }
         ).pipe(
-            tap(console.log),
+            //tap(console.log),
             catchError(this.handleError)
           );
 
   delete$ = (candidate: Candidate) =>
     <Observable<CandidateResponse>>this.http.delete<CandidateResponse>
       (`${this.apiUrl}/candidate/ping/delete/${candidate.id}`).pipe(
-        tap(console.log),
+        //tap(console.log),
         catchError(this.handleError)
       );
 
@@ -74,7 +74,7 @@ export class ServerService {
   deleteById$ = (id: string) =>
     <Observable<CandidateResponse>>this.http.delete<CandidateResponse>
       (`${this.apiUrl}/candidate/ping/delete/${id}`).pipe(
-        tap(console.log),
+        //tap(console.log),
         catchError(this.handleError)
       );
 

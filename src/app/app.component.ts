@@ -47,5 +47,6 @@ export class AppComponent {
       }
     );
   }
+  DataState = DataState
 }
 

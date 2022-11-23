@@ -1,13 +1,12 @@
 import { Component, ViewChild } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { Observable, startWith, map, catchError, of } from 'rxjs';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+import { BehaviorSubject, catchError, map, Observable, of, startWith } from 'rxjs';
 import { DataState } from './enum/data-state.enum';
 import { AppState } from './interface/app-state';
 import { Candidate } from './interface/candidate';
-import { CandidateResponse } from './interface/candidate-response';
 import { ServerService } from './service/server.service';
-import { MatSort } from '@angular/material/sort';
 
 @Component({
   selector: 'app-root',
@@ -17,6 +16,9 @@ import { MatSort } from '@angular/material/sort';
 export class AppComponent {
   appState$: Observable<AppState<Candidate[]>>;
   title = 'sample-project';
+  private filterSubject = new BehaviorSubject<string>('');
+  private dataSubject = new BehaviorSubject<Candidate[]>(null);
+
   constructor(private serviceService: ServerService) {
   }
 
@@ -28,12 +30,17 @@ export class AppComponent {
     this.appState$ = this.serviceService.candidates$
       .pipe(
         map(response => {
+          this.dataSubject.next(response);
           return {
             dataState: DataState.LOADED,
             appData: response
           }
         }),
-        startWith({ dataState: DataState.LOADING }),
+        startWith(
+          {
+            dataState: DataState.LOADING,
+            appData: this.dataSubject.value
+          }),
         catchError((error: string) => {
           console.log(error);
           return of({ dataState: DataState.ERROR, error: error })

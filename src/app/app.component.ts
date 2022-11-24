@@ -15,6 +15,7 @@ import { ServerService } from './service/server.service';
 })
 export class AppComponent {
   appState$: Observable<AppState<Candidate[]>>;
+  clientsideCachedCandidates = [];
   title = 'sample-project';
   private filterSubject = new BehaviorSubject<string>('');
   private dataSubject = new BehaviorSubject<Candidate[]>(null);
@@ -29,11 +30,12 @@ export class AppComponent {
   ngOnInit(): void {
     this.appState$ = this.serviceService.candidates$
       .pipe(
-        map(response => {
-          this.dataSubject.next(response);
+        map(candidates => {
+          this.clientsideCachedCandidates = candidates;
+          this.dataSubject.next(candidates);
           return {
             dataState: DataState.LOADED,
-            appData: response
+            appData: candidates
           }
         }),
         startWith(
@@ -54,6 +56,36 @@ export class AppComponent {
       }
     );
   }
-  DataState = DataState
+  DataState = DataState;
+
+  filterCandidates(name: string): void {
+    this.appState$ = this.serviceService
+      .filter$(name, this.clientsideCachedCandidates)
+      .pipe(
+        map(candidates => {
+          this.dataSubject.next(candidates);
+          return {
+            dataState: DataState.LOADED,
+            appData: candidates
+          }
+        }),
+        startWith(
+          {
+            dataState: DataState.LOADING,
+            appData: this.dataSubject.value
+          }),
+        catchError((error: string) => {
+          console.log(error);
+          return of({ dataState: DataState.ERROR, error: error })
+        })
+      );
+      this.refreshMatTable();
+  }
+
+  refreshMatTable() {
+    this.appState$.subscribe(val => {
+      this.dataSource.data = val.appData;
+    });
+  }
 }
 

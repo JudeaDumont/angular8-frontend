@@ -32,29 +32,12 @@ export class ServerService {
         catchError(this.handleError)
       );
 
-      filter$ = (name: string, response: CandidateResponse) =>
-        <Observable<CandidateResponse>> new Observable<CandidateResponse>(
+      filter$ = (name: string, candidates: Candidate[]) =>
+        <Observable<Candidate[]>> new Observable<Candidate[]>(
           subscriber => {
-            console.log(response);
+            console.log(candidates);
             subscriber.next(
-              // name === '' ? 
-              // {...response, 
-              //   message: `Candidates filtered by name: ${name}`}
-              // : {
-              //   ...response,
-              //   message: response.data.candidates
-              //   .filter(candidate => candidate.name === name)
-              //   .length > 0 
-              //   ?
-              //   `Candidates filtered by 
-              //   ${name.includes("chef") ? 'chef' : 'not chef'}:` 
-              //   :
-              //   `No candidates named ${name} found`,
-              //   data: {
-              //     candidates: response.data.candidates.filter
-              //     (candidate => candidate.name === name)
-              //   }
-              // }
+                candidates.filter(candidate => candidate.name.includes(name))
             );
             subscriber.complete();
           }

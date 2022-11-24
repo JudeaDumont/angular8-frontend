@@ -11,9 +11,9 @@
 </ng-container>
 
 <span>
-  <input 
-  type="text" 
-  name="match-name" 
+  <input
+  type="text"
+  name="match-name"
   id="match-name"
   (ngModelChange)="filterCandidates($event)"
   ngModel="">
@@ -36,3 +36,8 @@
 </table>
 
 <router-outlet></router-outlet>
+
+<!--todo: add text areas for adding, removing, and updating candidates using proper json-->
+<!--  then: modify backend to accept arrays of candidates to add, update, and delete-->
+
+<!--todo: create a pub sub system where client subscribes to a topic that tells the client new data is available-->

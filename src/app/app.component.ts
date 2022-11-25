@@ -30,12 +30,12 @@ export class AppComponent {
   ngOnInit(): void {
     this.appState$ = this.serviceService.candidates$
       .pipe(
-        map(candidates => {
-          this.clientsideCachedCandidates = candidates;
-          this.dataSubject.next(candidates);
+        map(response => {
+          this.clientsideCachedCandidates = response.data.candidates;
+          this.dataSubject.next(response.data.candidates);
           return {
             dataState: DataState.LOADED,
-            appData: candidates
+            appData: response.data.candidates
           }
         }),
         startWith(

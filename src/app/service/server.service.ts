@@ -12,7 +12,7 @@ export class ServerService {
   constructor(private http: HttpClient) { }
 
   candidates$ =
-    <Observable<Candidate[]>>this.http.get<Candidate[]>
+    <Observable<CandidateResponse>>this.http.get<CandidateResponse>
       (`${this.apiUrl}/api/v1/candidate`).pipe(
         //tap(console.log),
         catchError(this.handleError)
@@ -35,7 +35,6 @@ export class ServerService {
       filter$ = (name: string, candidates: Candidate[]) =>
         <Observable<Candidate[]>> new Observable<Candidate[]>(
           subscriber => {
-            console.log(candidates);
             subscriber.next(
                 candidates.filter(candidate => candidate.name.includes(name))
             );

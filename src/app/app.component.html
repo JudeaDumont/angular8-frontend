@@ -37,7 +37,32 @@
 
 <router-outlet></router-outlet>
 
-<!--todo: add text areas for adding, removing, and updating candidates using proper json-->
-<!--  then: modify backend to accept arrays of candidates to add, update, and delete-->
+<!--todo: add text areas for adding, removing, 
+  and updating candidates using proper json-->
+<!--  then: modify backend to accept arrays of 
+  candidates to add, update, and delete-->
 
-<!--todo: create a pub sub system where client subscribes to a topic that tells the client new data is available-->
+<!--todo: create a pub sub system where 
+  client subscribes to a topic that tells the 
+  client new data is available-->
+<!--todo: it is useful to understand 
+  how objects will be cached and batched 
+  with regard to the back end
+  One thing we want to have is batchability 
+  of objects to and from the DB
+  another thing we want is cacheability in the front end
+  if the backend is offline we show a big warning
+  but we still batch together user inputs
+  and when the backend comes back online
+  we push the batch through all the way to the database
+  we want to use existing database btach processing tools in psql
+  imagine that multiple UIs are being used, 
+  we use the law of "additions", backend comes back up
+  acquires the online clients it will manage,
+  clients push batch commands
+  backend waits for all of the batches to come in for
+  30 seconds, then runs all deletes, then all updates/additions
+  if something that has an update is deleted, then it just adds it.-->
+  
+
+  

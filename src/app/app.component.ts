@@ -6,6 +6,7 @@ import { BehaviorSubject, catchError, map, Observable, of, startWith } from 'rxj
 import { DataState } from './enum/data-state.enum';
 import { AppState } from './interface/app-state';
 import { Candidate } from './interface/candidate';
+import { CandidateResponse } from './interface/candidate-response';
 import { ServerService } from './service/server.service';
 
 @Component({
@@ -14,11 +15,11 @@ import { ServerService } from './service/server.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  appState$: Observable<AppState<Candidate[]>>;
+  appState$: Observable<AppState<CandidateResponse>>;
   clientsideCachedCandidates = [];
   title = 'sample-project';
   private filterSubject = new BehaviorSubject<string>('');
-  private dataSubject = new BehaviorSubject<Candidate[]>(null);
+  private dataSubject = new BehaviorSubject<CandidateResponse>(null);
 
   constructor(private serviceService: ServerService) {
   }
@@ -32,10 +33,10 @@ export class AppComponent {
       .pipe(
         map(response => {
           this.clientsideCachedCandidates = response.data.candidates;
-          this.dataSubject.next(response.data.candidates);
+          this.dataSubject.next(response);
           return {
             dataState: DataState.LOADED,
-            appData: response.data.candidates
+            appData: response
           }
         }),
         startWith(
@@ -48,43 +49,60 @@ export class AppComponent {
           return of({ dataState: DataState.ERROR, error: error })
         })
       );
-    this.appState$.subscribe(
-      val => {
-        this.dataSource.data = val.appData;
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
-      }
-    );
+      
+      this.appState$.subscribe(
+        state => {
+          this.dataSource.data = state.appData?.data.candidates;
+          this.dataSource.paginator = this.paginator;
+          this.dataSource.sort = this.sort;
+        }
+      );
   }
   DataState = DataState;
 
   filterCandidates(name: string): void {
-    this.appState$ = this.serviceService
-      .filter$(name, this.clientsideCachedCandidates)
-      .pipe(
-        map(candidates => {
-          this.dataSubject.next(candidates);
-          return {
-            dataState: DataState.LOADED,
-            appData: candidates
-          }
-        }),
-        startWith(
-          {
-            dataState: DataState.LOADING,
-            appData: this.dataSubject.value
+
+    //the theory is that null state errors arise out of async
+    //high probability of being correct^ 
+    //as illustrated by proper behavior of below code
+    this.appState$.subscribe(state => {
+      this.appState$ = this.serviceService
+        .filter$(name, this.clientsideCachedCandidates)
+        .pipe(
+          map(candidates => {
+            this.dataSubject.next({
+              ...state.appData,
+              data: {
+                candidates: candidates
+              }
+            });
+            return {
+              dataState: DataState.LOADED,
+              appData: {
+                ...state.appData,
+                data: {
+                  candidates: candidates
+                }
+              }
+            }
           }),
-        catchError((error: string) => {
-          console.log(error);
-          return of({ dataState: DataState.ERROR, error: error })
-        })
-      );
+          startWith(
+            {
+              dataState: DataState.LOADING,
+              appData: this.dataSubject.value
+            }),
+          catchError((error: string) => {
+            console.log(error);
+            return of({ dataState: DataState.ERROR, error: error })
+          })
+        );
       this.refreshMatTable();
+    });
   }
 
   refreshMatTable() {
     this.appState$.subscribe(val => {
-      this.dataSource.data = val.appData;
+      this.dataSource.data = val.appData.data.candidates;
     });
   }
 }

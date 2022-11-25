@@ -32,18 +32,18 @@ export class ServerService {
         catchError(this.handleError)
       );
 
-      filter$ = (name: string, candidates: Candidate[]) =>
-        <Observable<Candidate[]>> new Observable<Candidate[]>(
-          subscriber => {
-            subscriber.next(
-                candidates.filter(candidate => candidate.name.includes(name))
-            );
-            subscriber.complete();
-          }
-        ).pipe(
-            //tap(console.log),
-            catchError(this.handleError)
-          );
+  filter$ = (name: string, candidates: Candidate[]) =>
+    <Observable<Candidate[]>>new Observable<Candidate[]>(
+      subscriber => {
+        subscriber.next(
+          candidates.filter(candidate => candidate.name.includes(name))
+        );
+        subscriber.complete();
+      }
+    ).pipe(
+      //tap(console.log),
+      catchError(this.handleError)
+    );
 
   delete$ = (candidate: Candidate) =>
     <Observable<CandidateResponse>>this.http.delete<CandidateResponse>
@@ -63,7 +63,7 @@ export class ServerService {
   private handleError(error: HttpErrorResponse): Observable<never> {
     console.log(error);
     return throwError
-    (`An error occurred - Error Code: ${error.status}`);
+      (`An error occurred - Error Code: ${error.status}`);
 
   }
 }

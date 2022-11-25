@@ -1,6 +1,5 @@
 import { Candidate } from "./candidate";
 
-//this is not in use because the backend does not wrap the candidates in a  response object that contains the information below.
 export interface CandidateResponse {
     timeStamp: Date;
     statusCode: number;
@@ -13,3 +12,10 @@ export interface CandidateResponse {
         candidate?: Candidate,
     }
 }
+
+
+    //todo: make another post mapping that takes multiple candidates
+    //todo: make a delete mapping that takes multiple candidates
+    //todo: make use of post and delete mappings client side where 
+    // user enters proper json into a text area 
+    // that contains list of candidates to save and delete.

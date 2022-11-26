@@ -1,4 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -18,8 +19,9 @@ export class AppComponent {
   appState$: Observable<AppState<CandidateResponse>>;
   clientsideCachedCandidates = [];
   title = 'sample-project';
-  private filterSubject = new BehaviorSubject<string>('');
   private dataSubject = new BehaviorSubject<CandidateResponse>(null);
+  private isLoading = new BehaviorSubject<Boolean>(false);
+  isLoading$ = this.isLoading.asObservable();
 
   constructor(private serviceService: ServerService) {
   }
@@ -49,16 +51,22 @@ export class AppComponent {
           return of({ dataState: DataState.ERROR, error: error })
         })
       );
-      
-      this.appState$.subscribe(
-        state => {
-          this.dataSource.data = state.appData?.data.candidates;
-          this.dataSource.paginator = this.paginator;
-          this.dataSource.sort = this.sort;
-        }
-      );
+
+    this.appState$.subscribe(
+      state => {
+        this.dataSource.data = state.appData?.data.candidates;
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+      }
+    );
   }
   DataState = DataState;
+
+  refreshMatTable() {
+    this.appState$.subscribe(val => {
+      this.dataSource.data = val.appData.data.candidates;
+    });
+  }
 
   filterCandidates(name: string): void {
 
@@ -99,11 +107,51 @@ export class AppComponent {
       this.refreshMatTable();
     });
   }
-
-  refreshMatTable() {
-    this.appState$.subscribe(val => {
-      this.dataSource.data = val.appData.data.candidates;
-    });
+  saveCandidate(serverForm: NgForm): void {
+    this.isLoading.next(true);
+    this.appState$ =
+      this.serviceService.save$(serverForm.value as Candidate)
+        .pipe(
+          map(response => {
+            this.dataSubject.next(
+              {
+                //...state.appData, //this will fold in old state, i.e. appState being null during loading ;)
+                ...this.dataSubject.value,
+                data: {
+                  candidates: [
+                    {
+                      name: (serverForm.value as Candidate).name,
+                      id: response
+                    },
+                    ...this.dataSubject.value.data.candidates
+                  ]
+                  .filter(  //deduplicate, initializing with new Set does not deduplicate
+                    (value, index, self) =>
+                      index === self.findIndex((t) => (
+                        t.id === value.id && t.name === value.name
+                      )))
+                }
+              }
+            );
+            this.isLoading.next(false);
+            return {
+              dataState: DataState.LOADED,
+              appData: this.dataSubject.value
+            }
+          }),
+          startWith({
+            dataState: DataState.LOADED,
+            appData: this.dataSubject.value
+          }),
+          catchError((error: string) => {
+            console.log(error);
+            return of({
+              dataState: DataState.ERROR,
+              error: error
+            });
+          })
+        )
+    this.refreshMatTable();
   }
 }
 

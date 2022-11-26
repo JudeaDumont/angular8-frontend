@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, first, Observable, share, tap, throwError } from 'rxjs';
 import { Candidate } from '../interface/candidate';
 import { CandidateResponse } from '../interface/candidate-response';
 
@@ -14,6 +14,7 @@ export class ServerService {
   candidates$ =
     <Observable<CandidateResponse>>this.http.get<CandidateResponse>
       (`${this.apiUrl}/api/v1/candidate`).pipe(
+        first(),
         //tap(console.log),
         catchError(this.handleError)
       );
@@ -31,10 +32,12 @@ export class ServerService {
       catchError(this.handleError)
     );
 
-  save$ = (server: Candidate) =>
-    <Observable<CandidateResponse>>this.http.post<CandidateResponse>
-      (`${this.apiUrl}/server/save`, server).pipe(
-        //tap(console.log),
+  save$ = (candidate: Candidate) => 
+    <Observable<number>>this.http.post<number>
+      (`${this.apiUrl}/api/v1/candidate/saveReturnID`, candidate)
+      .pipe(
+        share(), //required to not duplicate requests per subscription
+        tap(console.log),
         catchError(this.handleError)
       );
 

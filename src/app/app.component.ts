@@ -30,42 +30,12 @@ export class AppComponent {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
-  private initializeMatDataTable() {
-    this.appState$.subscribe(
-      state => {
-        this.dataSource.data = state.appData?.data.candidates;
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
-      }
-    );
-  }
-
   ngOnInit(): void {
-    this.appState$ = this.serviceService.candidates$
-      .pipe(
-        map(response => {
-          this.clientsideCachedCandidates = response.data.candidates;
-          this.dataSubject.next(response);
-          return {
-            dataState: DataState.LOADED,
-            appData: response
-          }
-        }),
-        startWith(
-          {
-            dataState: DataState.LOADING,
-            appData: this.dataSubject.value
-          }),
-        catchError((error: string) => {
-          console.log(error);
-          return of({ dataState: DataState.ERROR, error: error })
-        })
-      );
-
+    this.initializeCandidates();
     this.initializeMatDataTable();
   }
 
-  DataState = DataState;
+  DataState = DataState; //expose type to html
 
   refresh() {
     this.appState$.subscribe(val => {
@@ -112,40 +82,17 @@ export class AppComponent {
       this.refresh();
     });
   }
+
   saveCandidate(serverForm: NgForm): void {
     this.isLoading.next(true);
     this.appState$ =
       this.serviceService.save$(serverForm.value as Candidate)
         .pipe(
           map(response => {
-            const newCandidate = ({
-              name: (serverForm.value as Candidate).name,
-              id: response
-            } as Candidate)
-            this.clientsideCachedCandidates =
-              this.clientsideCachedCandidates.concat(newCandidate)
-              .filter(  //deduplicate, initializing with new Set does not deduplicate
-              (value, index, self) =>
-                index === self.findIndex((t) => (
-                  t.id === value.id && t.name === value.name
-                )));
-            this.dataSubject.next(
-              {
-                //...state.appData, //this will fold in old state, i.e. appState being null during loading ;)
-                ...this.dataSubject.value,
-                data: {
-                  candidates: [
-                    newCandidate,
-                    ...this.dataSubject.value.data.candidates
-                  ]
-                    .filter(  //deduplicate, initializing with new Set does not deduplicate
-                      (value, index, self) =>
-                        index === self.findIndex((t) => (
-                          t.id === value.id && t.name === value.name
-                        )))
-                }
-              }
-            );
+            const newCandidate =
+              this.getCandidate(serverForm, response)
+            this.appendCandidateCacheAndDedup(newCandidate);
+            this.appendCandidatesDataSubject(newCandidate);
             this.isLoading.next(false);
             return {
               dataState: DataState.LOADED,
@@ -166,6 +113,7 @@ export class AppComponent {
         )
     this.refresh();
   }
+
   deleteCandidate(serverForm: NgForm): void {
     this.isLoading.next(true);
     this.appState$ =
@@ -173,36 +121,10 @@ export class AppComponent {
         .pipe(
           map(response => {
             this.clientsideCachedCandidates =
-              this.clientsideCachedCandidates.filter((candidate) => {
-                //remove candidate form list
-                return (candidate.id !==
-                  (serverForm.value as Candidate).id
-                  ? candidate
-                  : null)
-              })
-            this.dataSubject.next(
-              {
-                //...state.appData, //this will fold in old state, i.e. appState being null during loading ;)
-                ...this.dataSubject.value,
-                data: {
-                  candidates: [
-                    ...this.dataSubject.value.data.candidates
-                  ]
-                    .filter(  //deduplicate, initializing with new Set does not deduplicate
-                      (value, index, self) =>
-                        index === self.findIndex((t) => (
-                          t.id === value.id && t.name === value.name
-                        ))) // might be able to remove this
-                    .filter((candidate) => {
-                      //remove candidate form list
-                      return (candidate.id !==
-                        (serverForm.value as Candidate).id
-                        ? candidate
-                        : null)
-                    })
-                }
-              }
-            );
+              this.removeCandidateById(
+                this.clientsideCachedCandidates,
+                (serverForm.value as Candidate).id)
+            this.ejectDataSubject(serverForm);
             this.isLoading.next(false);
             return {
               dataState: DataState.LOADED,
@@ -222,6 +144,101 @@ export class AppComponent {
           })
         )
     this.refresh();
+  }
+
+  private initializeMatDataTable() {
+    this.appState$.subscribe(
+      state => {
+        this.dataSource.data = state.appData?.data.candidates;
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+      }
+    );
+  }
+
+  private initializeCandidates() {
+    this.appState$ = this.serviceService.candidates$
+      .pipe(
+        map(response => {
+          this.clientsideCachedCandidates = response.data.candidates;
+          this.dataSubject.next(response);
+          return {
+            dataState: DataState.LOADED,
+            appData: response
+          };
+        }),
+        startWith(
+          {
+            dataState: DataState.LOADING,
+            appData: this.dataSubject.value
+          }),
+        catchError((error: string) => {
+          console.log(error);
+          return of({ dataState: DataState.ERROR, error: error });
+        })
+      );
+  }
+
+  private appendCandidateCacheAndDedup(newCandidate: Candidate) {
+    this.clientsideCachedCandidates =
+      this.clientsideCachedCandidates.concat(newCandidate)
+        .filter(
+          (value, index, self) => index === self.findIndex((t) => (
+            t.id === value.id && t.name === value.name
+          )));
+  }
+
+  private appendCandidatesDataSubject(newCandidate: Candidate) {
+    this.dataSubject.next(
+      {
+        //...state.appData, //this will fold in old state, i.e. appState being null during loading ;)
+        ...this.dataSubject.value,
+        data: {
+          candidates: [
+            newCandidate,
+            ...this.dataSubject.value.data.candidates
+          ]
+            .filter(
+              (value, index, self) => index === self.findIndex((t) => (
+                t.id === value.id && t.name === value.name
+              )))
+        }
+      }
+    );
+  }
+
+  private getCandidate(serverForm: NgForm, response: number) {
+    return {
+      name: (serverForm.value as Candidate).name,
+      id: response
+    } as Candidate;
+  }
+
+  private removeCandidateById(
+    candidates: Candidate[],
+    id: number): Candidate[] {
+    return candidates.filter((candidate) => {
+      //remove candidate form list
+      return (candidate.id !==
+        id
+        ? candidate
+        : null);
+    });
+  }
+
+  private ejectDataSubject(serverForm: NgForm) {
+    this.dataSubject.next(
+      {
+        //...state.appData, //this will fold in old state, i.e. appState being null during loading ;)
+        ...this.dataSubject.value,
+        data: {
+          candidates: this.removeCandidateById(
+            this.dataSubject.value.data.candidates,
+            (serverForm.value as Candidate).id
+          )
+        }
+      }
+    );
   }
 }
 

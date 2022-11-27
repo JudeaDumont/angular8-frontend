@@ -3,7 +3,7 @@ import { NgForm } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { BehaviorSubject, catchError, map, Observable, of, startWith } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, startWith, VirtualTimeScheduler } from 'rxjs';
 import { DataState } from './enum/data-state.enum';
 import { AppState } from './interface/app-state';
 import { Candidate } from './interface/candidate';
@@ -30,6 +30,16 @@ export class AppComponent {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
+  private initializeMatDataTable() {
+    this.appState$.subscribe(
+      state => {
+        this.dataSource.data = state.appData?.data.candidates;
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+      }
+    );
+  }
+
   ngOnInit(): void {
     this.appState$ = this.serviceService.candidates$
       .pipe(
@@ -52,17 +62,12 @@ export class AppComponent {
         })
       );
 
-    this.appState$.subscribe(
-      state => {
-        this.dataSource.data = state.appData?.data.candidates;
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
-      }
-    );
+    this.initializeMatDataTable();
   }
+
   DataState = DataState;
 
-  refreshMatTable() {
+  refresh() {
     this.appState$.subscribe(val => {
       this.dataSource.data = val.appData.data.candidates;
     });
@@ -104,7 +109,7 @@ export class AppComponent {
             return of({ dataState: DataState.ERROR, error: error })
           })
         );
-      this.refreshMatTable();
+      this.refresh();
     });
   }
   saveCandidate(serverForm: NgForm): void {
@@ -113,23 +118,31 @@ export class AppComponent {
       this.serviceService.save$(serverForm.value as Candidate)
         .pipe(
           map(response => {
+            const newCandidate = ({
+              name: (serverForm.value as Candidate).name,
+              id: response
+            } as Candidate)
+            this.clientsideCachedCandidates =
+              this.clientsideCachedCandidates.concat(newCandidate)
+              .filter(  //deduplicate, initializing with new Set does not deduplicate
+              (value, index, self) =>
+                index === self.findIndex((t) => (
+                  t.id === value.id && t.name === value.name
+                )));
             this.dataSubject.next(
               {
                 //...state.appData, //this will fold in old state, i.e. appState being null during loading ;)
                 ...this.dataSubject.value,
                 data: {
                   candidates: [
-                    {
-                      name: (serverForm.value as Candidate).name,
-                      id: response
-                    },
+                    newCandidate,
                     ...this.dataSubject.value.data.candidates
                   ]
-                  .filter(  //deduplicate, initializing with new Set does not deduplicate
-                    (value, index, self) =>
-                      index === self.findIndex((t) => (
-                        t.id === value.id && t.name === value.name
-                      )))
+                    .filter(  //deduplicate, initializing with new Set does not deduplicate
+                      (value, index, self) =>
+                        index === self.findIndex((t) => (
+                          t.id === value.id && t.name === value.name
+                        )))
                 }
               }
             );
@@ -151,7 +164,64 @@ export class AppComponent {
             });
           })
         )
-    this.refreshMatTable();
+    this.refresh();
+  }
+  deleteCandidate(serverForm: NgForm): void {
+    this.isLoading.next(true);
+    this.appState$ =
+      this.serviceService.delete$(serverForm.value as Candidate)
+        .pipe(
+          map(response => {
+            this.clientsideCachedCandidates =
+              this.clientsideCachedCandidates.filter((candidate) => {
+                //remove candidate form list
+                return (candidate.id !==
+                  (serverForm.value as Candidate).id
+                  ? candidate
+                  : null)
+              })
+            this.dataSubject.next(
+              {
+                //...state.appData, //this will fold in old state, i.e. appState being null during loading ;)
+                ...this.dataSubject.value,
+                data: {
+                  candidates: [
+                    ...this.dataSubject.value.data.candidates
+                  ]
+                    .filter(  //deduplicate, initializing with new Set does not deduplicate
+                      (value, index, self) =>
+                        index === self.findIndex((t) => (
+                          t.id === value.id && t.name === value.name
+                        ))) // might be able to remove this
+                    .filter((candidate) => {
+                      //remove candidate form list
+                      return (candidate.id !==
+                        (serverForm.value as Candidate).id
+                        ? candidate
+                        : null)
+                    })
+                }
+              }
+            );
+            this.isLoading.next(false);
+            return {
+              dataState: DataState.LOADED,
+              appData: this.dataSubject.value
+            }
+          }),
+          startWith({
+            dataState: DataState.LOADED,
+            appData: this.dataSubject.value
+          }),
+          catchError((error: string) => {
+            console.log(error);
+            return of({
+              dataState: DataState.ERROR,
+              error: error
+            });
+          })
+        )
+    this.refresh();
   }
 }
 

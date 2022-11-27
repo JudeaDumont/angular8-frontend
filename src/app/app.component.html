@@ -37,12 +37,12 @@
 
 <div id="addCandidateModal">
   <form
-  #candidateForm="ngForm"
-  (ngSubmit)="saveCandidate(candidateForm)">
-    <div id="modal-header">
+  #saveCandidateForm="ngForm"
+  (ngSubmit)="saveCandidate(saveCandidateForm)">
+    <div id="save-modal-header">
       <h4>Add Candidate</h4>
     </div>
-    <div id="modal-body">
+    <div id="save-modal-body">
       <label>Name</label>
       <input
       ngModel
@@ -51,12 +51,40 @@
       name="name"
       required>
     </div>
-    <div id="modal-footer">
+    <div id="save-modal-footer">
       <button
       type="submit"
-      [disabled]="candidateForm.invalid || (isLoading$ | async)">
+      [disabled]="saveCandidateForm.invalid || (isLoading$ | async)">
       <span *ngIf="isLoading$ | async">Saving...</span>
       <span *ngIf="!(isLoading$ | async)">Add</span>
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- todo: type="wholenumber" -->
+<div id="deleteCandidateModal">
+  <form
+  #deleteCandidateForm="ngForm"
+  (ngSubmit)="deleteCandidate(deleteCandidateForm)">
+    <div id="delete-modal-header">
+      <h4>Delete Candidate</h4>
+    </div>
+    <div id="delete-modal-body">
+      <label>Id</label>
+      <input
+      ngModel
+      id="delete-candidate-id"
+      type="number"
+      name="id"
+      required>
+    </div>
+    <div id="delete-modal-footer">
+      <button
+      type="submit"
+      [disabled]="deleteCandidateForm.invalid || (isLoading$ | async)">
+      <span *ngIf="isLoading$ | async">Deleting...</span>
+      <span *ngIf="!(isLoading$ | async)">Delete</span>
       </button>
     </div>
   </form>

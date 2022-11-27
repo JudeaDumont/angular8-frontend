@@ -42,8 +42,8 @@ export class ServerService {
       );
 
   delete$ = (candidate: Candidate) =>
-    <Observable<CandidateResponse>>this.http.delete<CandidateResponse>
-      (`${this.apiUrl}/candidate/ping/delete/${candidate.id}`).pipe(
+    <Observable<number>>this.http.delete<number>
+      (`${this.apiUrl}/api/v1/candidate/${candidate.id}`).pipe(
         //tap(console.log),
         catchError(this.handleError)
       );
@@ -51,7 +51,7 @@ export class ServerService {
 
   deleteById$ = (id: string) =>
     <Observable<CandidateResponse>>this.http.delete<CandidateResponse>
-      (`${this.apiUrl}/candidate/ping/delete/${id}`).pipe(
+      (`${this.apiUrl}/api/v1/candidate/delete/${id}`).pipe(
         //tap(console.log),
         catchError(this.handleError)
       );

@@ -92,7 +92,7 @@ export class AppComponent {
             const newCandidate =
               this.getCandidate(serverForm, response)
             this.appendCandidateCacheAndDedup(newCandidate);
-            this.appendCandidatesDataSubject(newCandidate);
+            this.appendCandidatesDataSubjectAndDedup(newCandidate);
             this.isLoading.next(false);
             return {
               dataState: DataState.LOADED,
@@ -188,7 +188,8 @@ export class AppComponent {
           )));
   }
 
-  private appendCandidatesDataSubject(newCandidate: Candidate) {
+  private appendCandidatesDataSubjectAndDedup
+  (newCandidate: Candidate) {
     this.dataSubject.next(
       {
         //...state.appData, //this will fold in old state, i.e. appState being null during loading ;)

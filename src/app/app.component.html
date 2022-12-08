@@ -83,6 +83,7 @@
     <div id="delete-modal-footer">
       <button
       type="submit"
+      name="delete-candidate-by-id"
       [disabled]="deleteCandidateForm.invalid || (isLoading$ | async)">
       <span *ngIf="isLoading$ | async">Deleting...</span>
       <span *ngIf="!(isLoading$ | async)">Delete</span>

@@ -39,7 +39,7 @@ export class AppComponent {
 
   refresh() {
     this.appState$.subscribe(val => {
-      this.dataSource.data = val.appData.data?.candidates;
+      this.dataSource.data = val.appData?.data?.candidates;
     });
   }
 
@@ -149,7 +149,7 @@ export class AppComponent {
   private initializeMatDataTable() {
     this.appState$.subscribe(
       state => {
-        this.dataSource.data = state.appData?.data.candidates;
+        this.dataSource.data = state.appData?.data?.candidates;
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
       }
@@ -160,7 +160,7 @@ export class AppComponent {
     this.appState$ = this.serviceService.candidates$
       .pipe(
         map(response => {
-          this.clientsideCachedCandidates = response.data.candidates;
+          this.clientsideCachedCandidates = response?.data?.candidates;
           this.dataSubject.next(response);
           return {
             dataState: DataState.LOADED,
@@ -197,7 +197,7 @@ export class AppComponent {
         data: {
           candidates: [
             newCandidate,
-            ...this.dataSubject.value.data.candidates
+            ...this.dataSubject.value?.data?.candidates
           ]
             .filter(
               (value, index, self) => index === self.findIndex((t) => (
@@ -234,7 +234,7 @@ export class AppComponent {
         ...this.dataSubject.value,
         data: {
           candidates: this.removeCandidateById(
-            this.dataSubject.value.data.candidates,
+            this.dataSubject.value?.data?.candidates,
             (serverForm.value as Candidate).id
           )
         }

@@ -111,6 +111,7 @@ export class AppComponent {
             });
           })
         )
+        this.serviceService.candidates$.pipe();//debug
     this.refresh();
   }
 

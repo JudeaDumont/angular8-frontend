@@ -31,6 +31,7 @@ export class AppComponent {
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
   ngOnInit(): void {
+    console.log("ngOnInit");
     this.initializeCandidates();
     this.initializeMatDataTable();
   }
@@ -84,6 +85,7 @@ export class AppComponent {
   }
 
   saveCandidate(serverForm: NgForm): void {
+    console.log("saveCandidate");
     this.isLoading.next(true);
     this.appState$ =
       this.serviceService.save$(serverForm.value as Candidate)
@@ -181,6 +183,8 @@ export class AppComponent {
   }
 
   private initializeCandidates() {
+    
+    console.log("initializeCandidates");
     this.appState$ = this.serviceService.candidates$
       .pipe(
         map(response => {

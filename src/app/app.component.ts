@@ -113,30 +113,6 @@ export class AppComponent {
             });
           })
         )
-
-
-    //debug
-    this.appState$ = this.serviceService.candidates$
-      .pipe(
-        map(response => {
-          this.clientsideCachedCandidates = response?.data?.candidates;
-          this.dataSubject.next(response);
-          return {
-            dataState: DataState.LOADED,
-            appData: response
-          };
-        }),
-        startWith(
-          {
-            dataState: DataState.LOADING,
-            appData: this.dataSubject.value
-          }),
-        catchError((error: string) => {
-          console.log(error);
-          return of({ dataState: DataState.ERROR, error: error });
-        })
-      );
-    //debug
     this.refresh();
   }
 

@@ -39,7 +39,7 @@ export class AppComponent {
 
   refresh() {
     this.appState$.subscribe(val => {
-      this.dataSource.data = val.appData.data.candidates;
+      this.dataSource.data = val.appData.data?.candidates;
     });
   }
 

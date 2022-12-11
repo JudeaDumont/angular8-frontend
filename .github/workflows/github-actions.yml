@@ -79,29 +79,14 @@ jobs:
 
         #fix for dbus included
         run: |
-          apt-get -q install --yes xvfb
-          apt-get -q install --yes dbus
-          mkdir /run/dbus -p
-          dbus-daemon --system
-
-          apt-get -q install -y libappindicator1 fonts-liberation
-          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-          dpkg -i google-chrome*.deb || true
-          apt-get -q install --yes -f
-          ln -sf /usr/bin/google-chrome-stable /usr/bin/google-chrome
-          google-chrome --version
-
-          google-chrome --headless --no-sandbox
-          Xvfb :0 -ac -screen 0 1024x768x24 &
 
           cd java-ecosystem-project/webapi
           export JASYPT_ENCRYPTOR_PASSWORD=secretkey
           mvn spring-boot:run &
           cd ../../angular
           ng serve &
-          cd ..
 
-          cd SeleniumWithCucucumber
+          cd ../SeleniumWithCucucumber
           mvn -q clean verify -Dtestng.dtd.http=true
 
       - uses: deblockt/cucumber-report-annotations-action@v1.7

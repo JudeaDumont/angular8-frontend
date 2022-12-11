@@ -79,7 +79,7 @@ jobs:
 
         #fix for dbus included
         run: |
-          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb 1> /dev/null
           dpkg -i google-chrome*.deb || true
           apt-get -q install --yes -f
           ln -sf /usr/bin/google-chrome-stable /usr/bin/google-chrome
@@ -98,7 +98,7 @@ jobs:
 
       - name: Run Cucumber/Selenium
         run: |
-          cd ../SeleniumWithCucucumber
+          cd ../../SeleniumWithCucucumber
           mvn -q clean verify -Dtestng.dtd.http=true
       - uses: deblockt/cucumber-report-annotations-action@v1.7
         with:

@@ -17,8 +17,8 @@ jobs:
           POSTGRES_HOST: postgres
         ports:
           - 5432:5432
-          - 4200:4200
-          - 7777:7777
+#          - 4200:4200
+#          - 7777:7777
         options: >-
           --health-cmd pg_isready
           --health-interval 10s

@@ -65,9 +65,6 @@ jobs:
       - name: Install and Run Angular
         run: |
           cd angular
-          pwd
-          apt-get -q install --yes npm
-          yes | npm install -g @angular/cli
           yes | npm install -g @angular/core
           npm install --save-dev @angular-devkit/build-angular@15.0.0
           yes | npm install @angular/material@15.0.0

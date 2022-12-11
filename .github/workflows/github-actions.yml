@@ -1,7 +1,5 @@
 name: GitHub Actions
 on: [ push ]
-env:
-  CONTAINER_NAME: "stack"
 jobs:
   build-and-test-job:
     runs-on: ubuntu-latest
@@ -10,11 +8,11 @@ jobs:
       postgres:
         image: postgres:latest
         env:
-          POSTGRES_PASSWORD: root #req
-          POSTGRES_DB: sampledb #req
-          POSTGRES_PORT: 5432 #req
-          POSTGRES_USER: postgres #req
-          #POSTGRES_HOST: postgres
+          POSTGRES_DB: sampledb
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: root
+          POSTGRES_HOST: postgres
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -33,25 +31,23 @@ jobs:
           repository: JudeaDumont/java-ecosystem-project
           path: ./java-ecosystem-project
 
-
-      - name: Install PostgreSQL client & Maven
+      - name: Update apt-get
         run: |
-          apt-get -q update
-          apt-get -q install --yes maven
-          apt-get -q install --yes postgresql-client
+          apt-get -q update 1> /dev/null
+
+      - name: Install PostgreSQL client
+        run: |
+          apt-get -q install --yes postgresql-client 1> /dev/null
+
+      - name: Install Maven
+        run: |
+          apt-get -q install --yes maven 1> /dev/null
 
       - name: Migrate database, build project for flyway
         run: |
           cd java-ecosystem-project
-          pwd
-          mvn -q flyway:baseline -s .github/workflows/maven-settings.xml --file webapi/pom.xml
-          mvn -q flyway:migrate -s .github/workflows/maven-settings.xml --file webapi/pom.xml
-
-        env:
-          POSTGRES_HOST: postgres
-          POSTGRES_PORT: 5432
-          POSTGRES_PASSWORD: root
-          PGPASSWORD: root
+          mvn -q flyway:baseline -s .github/workflows/maven-settings.xml --file webapi/pom.xml 1> /dev/null
+          mvn -q flyway:migrate -s .github/workflows/maven-settings.xml --file webapi/pom.xml 1> /dev/null
 
       - name: Run tests with Maven
         run: |

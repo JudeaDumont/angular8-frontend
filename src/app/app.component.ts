@@ -210,7 +210,7 @@ export class AppComponent {
           (value, index, self) => index === self.findIndex((t) => (
             t.id === value.id && t.name === value.name
           )));
-          console.log(this.clientsideCachedCandidates);
+          console.log("this.clientsideCachedCandidates:" + JSON.stringify(this.clientsideCachedCandidates));
   }
 
   private appendCandidatesDataSubjectAndDedup

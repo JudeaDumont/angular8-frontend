@@ -65,8 +65,7 @@ jobs:
       - name: Install and Run Angular
         run: |
           cd angular
-          yes | npm install -g @angular/core
-          yes | npm install --save-dev @angular-devkit/build-angular@15.0.0
+          yes | npm install -g @angular/cli
           ng update @angular/cli @angular/core @angular/material --allow-dirty
 
       - name: Checkout Selenium/Cucumber

@@ -113,6 +113,26 @@ export class AppComponent {
             });
           })
         )
+        
+    console.log("debug");
+    this.serviceService.candidates$
+      .pipe(
+        map(response => {
+          return {
+            dataState: DataState.LOADED,
+            appData: response
+          };
+        }),
+        startWith(
+          {
+            dataState: DataState.LOADING,
+            appData: this.dataSubject.value
+          }),
+        catchError((error: string) => {
+          console.log(error);
+          return of({ dataState: DataState.ERROR, error: error });
+        })
+      );
     this.refresh();
   }
 
@@ -159,7 +179,7 @@ export class AppComponent {
   }
 
   private initializeCandidates() {
-    
+
     console.log("initializeCandidates");
     this.appState$ = this.serviceService.candidates$
       .pipe(

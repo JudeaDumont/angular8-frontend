@@ -31,7 +31,6 @@ export class AppComponent {
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
   ngOnInit(): void {
-    console.log("ngOnInit");
     this.initializeCandidates();
     this.initializeMatDataTable();
   }
@@ -85,7 +84,6 @@ export class AppComponent {
   }
 
   saveCandidate(serverForm: NgForm): void {
-    console.log("saveCandidate");
     this.isLoading.next(true);
     this.appState$ =
       this.serviceService.save$(serverForm.value as Candidate)
@@ -113,26 +111,6 @@ export class AppComponent {
             });
           })
         )
-        
-    console.log("debug");
-    this.serviceService.candidates$
-      .pipe(
-        map(response => {
-          return {
-            dataState: DataState.LOADED,
-            appData: response
-          };
-        }),
-        startWith(
-          {
-            dataState: DataState.LOADING,
-            appData: this.dataSubject.value
-          }),
-        catchError((error: string) => {
-          console.log(error);
-          return of({ dataState: DataState.ERROR, error: error });
-        })
-      );
     this.refresh();
   }
 
@@ -179,8 +157,6 @@ export class AppComponent {
   }
 
   private initializeCandidates() {
-
-    console.log("initializeCandidates");
     this.appState$ = this.serviceService.candidates$
       .pipe(
         map(response => {
@@ -210,7 +186,6 @@ export class AppComponent {
           (value, index, self) => index === self.findIndex((t) => (
             t.id === value.id && t.name === value.name
           )));
-          console.log("this.clientsideCachedCandidates:" + JSON.stringify(this.clientsideCachedCandidates));
   }
 
   private appendCandidatesDataSubjectAndDedup

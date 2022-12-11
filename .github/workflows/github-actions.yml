@@ -79,7 +79,7 @@ jobs:
 
         #fix for dbus included
         run: |
-
+          ln -sf /usr/bin/google-chrome-stable /usr/bin/google-chrome
           cd java-ecosystem-project/webapi
           export JASYPT_ENCRYPTOR_PASSWORD=secretkey
           mvn spring-boot:run &

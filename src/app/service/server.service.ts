@@ -37,7 +37,7 @@ export class ServerService {
       (`${this.apiUrl}/api/v1/candidate/saveReturnID`, candidate)
       .pipe(
         share(), //required to not duplicate requests per subscription
-        tap(console.log),
+        //tap(console.log),
         catchError(this.handleError)
       );
 

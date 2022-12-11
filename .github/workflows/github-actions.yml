@@ -75,16 +75,6 @@ jobs:
           repository: JudeaDumont/SeleniumWithCucucumber
           path: ./SeleniumWithCucucumber
 
-      - name: Run Spring Boot and Angular
-
-        #fix for dbus included
-        run: |
-          cd java-ecosystem-project/webapi
-          export JASYPT_ENCRYPTOR_PASSWORD=secretkey
-          mvn spring-boot:run &
-          cd ../../angular
-          ng serve &
-
       - name: Install Chrome
         run: |
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
@@ -92,11 +82,15 @@ jobs:
           apt-get -q install --yes -f
           ln -sf /usr/bin/google-chrome-stable /usr/bin/google-chrome
 
-      - name: Run Cucumber/Selenium
+      - name: Run Spring Boot, Angular, and Selenium
         run: |
-          cd SeleniumWithCucucumber
+          cd java-ecosystem-project/webapi
+          export JASYPT_ENCRYPTOR_PASSWORD=secretkey
+          mvn spring-boot:run &
+          cd ../../angular
+          ng serve &
+          cd ../SeleniumWithCucucumber
           mvn -q clean verify -Dtestng.dtd.http=true
-
       - uses: deblockt/cucumber-report-annotations-action@v1.7
         with:
           access-token: ${{ secrets.GITHUB_TOKEN }}

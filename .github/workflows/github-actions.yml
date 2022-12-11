@@ -10,11 +10,11 @@ jobs:
       postgres:
         image: postgres:latest
         env:
-          #POSTGRES_PASSWORD: root
-          POSTGRES_DB: sampledb
-          POSTGRES_PORT: 5432
-          POSTGRES_USER: postgres
-          POSTGRES_HOST: postgres
+          POSTGRES_PASSWORD: root #req
+          POSTGRES_DB: sampledb #req
+          POSTGRES_PORT: 5432 #req
+          POSTGRES_USER: postgres #req
+          #POSTGRES_HOST: postgres
         options: >-
           --health-cmd pg_isready
           --health-interval 10s

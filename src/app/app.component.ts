@@ -23,7 +23,7 @@ export class AppComponent {
   private isLoading = new BehaviorSubject<Boolean>(false);
   isLoading$ = this.isLoading.asObservable();
 
-  constructor(private serviceService: ServerService) {
+  constructor(private candidateService: ServerService) {
   }
 
   dataSource = new MatTableDataSource<Candidate>();
@@ -39,7 +39,7 @@ export class AppComponent {
 
   refresh() {
     this.appState$.subscribe(val => {
-      this.dataSource.data = val.appData?.data?.candidates;
+      this.dataSource.data = this.clientsideCachedCandidates;
     });
   }
 
@@ -49,7 +49,7 @@ export class AppComponent {
     //high probability of being correct^ 
     //as illustrated by proper behavior of below code
     this.appState$.subscribe(state => {
-      this.appState$ = this.serviceService
+      this.appState$ = this.candidateService
         .filter$(name, this.clientsideCachedCandidates)
         .pipe(
           map(candidates => {
@@ -86,7 +86,7 @@ export class AppComponent {
   saveCandidate(serverForm: NgForm): void {
     this.isLoading.next(true);
     this.appState$ =
-      this.serviceService.save$(serverForm.value as Candidate)
+      this.candidateService.save$(serverForm.value as Candidate)
         .pipe(
           map(response => {
             const newCandidate =
@@ -117,7 +117,7 @@ export class AppComponent {
   deleteCandidate(serverForm: NgForm): void {
     this.isLoading.next(true);
     this.appState$ =
-      this.serviceService.delete$(serverForm.value as Candidate)
+      this.candidateService.delete$(serverForm.value as Candidate)
         .pipe(
           map(response => {
             this.clientsideCachedCandidates =
@@ -157,7 +157,7 @@ export class AppComponent {
   }
 
   private initializeCandidates() {
-    this.appState$ = this.serviceService.candidates$
+    this.appState$ = this.candidateService.candidates$
       .pipe(
         map(response => {
           this.clientsideCachedCandidates = response?.data?.candidates;

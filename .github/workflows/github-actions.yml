@@ -8,11 +8,11 @@ jobs:
       postgres:
         image: postgres:latest
         env:
-          POSTGRES_DB: sampledb
-          POSTGRES_PORT: 5432
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: root
-          POSTGRES_HOST: postgres
+          POSTGRES_DB: ${{secrets.ACTIONS_POSTGRES_DB}}
+          POSTGRES_PORT: ${{secrets.ACTIONS_POSTGRES_PORT}}
+          POSTGRES_USER: ${{secrets.ACTIONS_POSTGRES_USER}}
+          POSTGRES_PASSWORD: ${{secrets.ACTIONS_POSTGRES_PASSWORD}}
+          POSTGRES_HOST: ${{secrets.ACTIONS_POSTGRES_HOST}}
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -54,7 +54,7 @@ jobs:
           cd java-ecosystem-project/webapi
           mvn -q -B test
         env:
-          JASYPT_ENCRYPTOR_PASSWORD: "secretkey" #required for yamlparser test
+          JASYPT_ENCRYPTOR_PASSWORD: "${{secrets.ACTIONS_JASYPT_ENCRYPTOR_PASSWORD}}" #required for yamlparser test
 
       - name: Checkout Angular
         uses: actions/checkout@v3
@@ -86,7 +86,7 @@ jobs:
       - name: Run Spring Boot, Angular, and Selenium
         run: |
           cd java-ecosystem-project/webapi
-          export JASYPT_ENCRYPTOR_PASSWORD=secretkey
+          export JASYPT_ENCRYPTOR_PASSWORD=${{secrets.ACTIONS_JASYPT_ENCRYPTOR_PASSWORD}}
           mvn spring-boot:run &
           cd ../../angular
           ng serve &

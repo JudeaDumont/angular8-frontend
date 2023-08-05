@@ -1,3 +1,8 @@
+# angular8-frontend
+only works via:
+npm install
+npm run
+
 # SampleProject
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.2.9.

@@ -3,10 +3,6 @@ only works via:
 npm install
 npm run
 
-# SampleProject
-
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.2.9.
-
 ## Code scaffolding
 
 Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.

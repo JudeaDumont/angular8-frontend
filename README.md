@@ -29,4 +29,7 @@ You will need to run the selenium test suite at https://github.com/JudeaDumont/S
 
 ## Further help
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+Might be helpful to check out the github repositories that are to be used in conjunction with this repository.
+JudeaDumont/java-ecosystem-project
+JudeaDumont/angular8-frontend
+JudeaDumont/SeleniumWithCucucumber

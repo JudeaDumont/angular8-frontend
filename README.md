@@ -30,6 +30,10 @@ You will need to run the selenium test suite at https://github.com/JudeaDumont/S
 ## Further help
 
 Might be helpful to check out the github repositories that are to be used in conjunction with this repository and see the readmes there.
+
+## Backend
 JudeaDumont/java-ecosystem-project
+https://github.com/JudeaDumont/java-ecosystem-project.git
+
 JudeaDumont/angular8-frontend
 JudeaDumont/SeleniumWithCucucumber

@@ -35,5 +35,8 @@ Might be helpful to check out the github repositories that are to be used in con
 JudeaDumont/java-ecosystem-project
 https://github.com/JudeaDumont/java-ecosystem-project.git
 
+## Frontend
+https://github.com/JudeaDumont/java-ecosystem-project.git
 JudeaDumont/angular8-frontend
+
 JudeaDumont/SeleniumWithCucucumber

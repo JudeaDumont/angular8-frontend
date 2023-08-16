@@ -36,8 +36,9 @@ JudeaDumont/java-ecosystem-project
 https://github.com/JudeaDumont/java-ecosystem-project.git
 
 ## Frontend
-https://github.com/JudeaDumont/java-ecosystem-project.git
 JudeaDumont/angular8-frontend
+https://github.com/JudeaDumont/angular8-frontend.git
 
 ## Front End Automated Test Suite
 JudeaDumont/SeleniumWithCucucumber
+https://github.com/JudeaDumont/SeleniumWithCucucumber.git

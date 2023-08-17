@@ -42,3 +42,7 @@ https://github.com/JudeaDumont/angular8-frontend.git
 ## Front End Automated Test Suite
 JudeaDumont/SeleniumWithCucucumber
 https://github.com/JudeaDumont/SeleniumWithCucucumber.git
+
+## Pipeline
+Github-actions
+.github\workflows\github-actions.yml

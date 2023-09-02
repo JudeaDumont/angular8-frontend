@@ -1,5 +1,17 @@
+# Setup
+install nodejs from: https://nodejs.org/en/download
+personally I like to check the "install automatically" box 
+for setting up additional tooling as necessary
+
+pay attention to what it installs, 
+knowing your local stack and stack versions can save hours of headache.
+
+you will also need to perform a system restart after it finishes
+
 # angular8-frontend
 only works via:
+
+cd C:\dev\angular8-frontend
 npm install
 npm run
 

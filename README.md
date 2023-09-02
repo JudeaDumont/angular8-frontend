@@ -13,7 +13,7 @@ only works via:
 
 cd C:\dev\angular8-frontend
 npm install
-npm run
+npm run start
 
 # SampleProject
 
